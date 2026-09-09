@@ -8,6 +8,7 @@ from app.models.user import User
 class EmailAlreadyRegisteredError(Exception):
     pass
 
+
 async def create_user(*, db: AsyncSession, user_in: UserCreate) -> User:
     repo = UserRepository(db=db)
     user = await repo.create(
