@@ -10,3 +10,7 @@ class UserOut(BaseModel):
 
     class Config:
         from_attribures = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
