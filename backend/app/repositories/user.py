@@ -1,8 +1,9 @@
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.user import User
+from fastapi import Depends
+from app.db.session import get_db
 
 
 class UserRepository:
@@ -27,3 +28,6 @@ class UserRepository:
         )
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
+
+def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
+    return UserRepository(db)
