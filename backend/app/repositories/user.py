@@ -1,4 +1,5 @@
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
@@ -17,5 +18,12 @@ class UserRepository:
             index_elements=[User.email]
         ).returning(User)
 
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_by_email(self, *, email: str) -> User | None:
+        stmt = select(User).where(
+           User.email == email
+        )
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
