@@ -29,5 +29,13 @@ class UserRepository:
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_id(self, *, user_id: int) -> User | None:
+        stmt = select(User).where(
+            User.id == user_id
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     return UserRepository(db)
