@@ -17,7 +17,7 @@ async def create_user(*, repo: UserRepository, user_in: UserCreate) -> User:
         raise EmailAlreadyRegisteredError()
     return user
 
-async def authenticate_user(*,repo: UserRepository, email: str, password: str) -> User | None:
+async def authenticate_user(*, repo: UserRepository, email: str, password: str) -> User | None:
     user = await repo.get_by_email(email=email)
     if user is None:
         return None
