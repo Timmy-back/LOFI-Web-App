@@ -24,7 +24,7 @@ async def register(
         raise HTTPException(status_code=400, detail="Email already registered")
 
 @router.post("/login", response_model=Token)
-@limiter.limit("5/minute") # type: ignore
+@limiter.limit("5/minute")
 async def login(
     request: Request,
     user_in: UserCreate,
