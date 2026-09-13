@@ -1,7 +1,8 @@
 import redis.asyncio as redis
 from app.db.redis import get_redis
 from app.core.config import settings
-from fastapi import APIRouter, Depends, HTTPException
+from app.core.limiter import limiter
+from fastapi import APIRouter, Depends, HTTPException, Request
 from app.schemas.user import UserCreate, UserOut, Token, RefreshRequest
 from app.services.user import authenticate_user, create_user, EmailAlreadyRegisteredError
 from app.repositories.user import UserRepository, get_user_repository
@@ -12,14 +13,20 @@ from app.models.user import User
 router = APIRouter()
 
 @router.post("/register", response_model=UserOut)
-async def register(user_in: UserCreate, repo: UserRepository = Depends(get_user_repository)):
+@limiter.limit("5/minute")
+async def register(
+    request: Request,
+    user_in: UserCreate,
+    repo: UserRepository = Depends(get_user_repository),):
     try:
         return await create_user(repo=repo, user_in=user_in)
     except EmailAlreadyRegisteredError:
         raise HTTPException(status_code=400, detail="Email already registered")
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute") # type: ignore
 async def login(
+    request: Request,
     user_in: UserCreate,
     repo: UserRepository = Depends(get_user_repository),
     redis_client: redis.Redis = Depends(get_redis)
